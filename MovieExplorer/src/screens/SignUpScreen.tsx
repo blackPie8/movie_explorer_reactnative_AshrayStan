@@ -3,7 +3,13 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions,
 
 const { width, height } = Dimensions.get('window');
 
-export default function SignUpScreen({ navigation }) {
+interface SignUpScreenProps {
+  navigation:{
+    navigate: (screen: string) => void;
+  }
+}
+
+export default function SignUpScreen({ navigation } : SignUpScreenProps) {
   return (
     <View style={styles.container}>
       <Image

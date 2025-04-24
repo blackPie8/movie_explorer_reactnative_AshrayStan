@@ -3,7 +3,13 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions 
 
 const { width, height } = Dimensions.get('window');
 
-export default function LoginScreen({navigation}) {
+interface LoginScreenProps {
+  navigation: {
+    navigate: (screen: string) => void;
+  }
+}
+
+export default function LoginScreen({navigation}: LoginScreenProps) {
   return (
     <View style={styles.container}>
       <Image
