@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flex: 1,
     backgroundColor: '#fff',
-    paddingBottom: height * 0.04, // added to keep some space at bottom
+    paddingBottom: height * 0.04,
   },
   logo: {
     width: width * 0.55,
