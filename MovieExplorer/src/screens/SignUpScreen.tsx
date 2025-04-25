@@ -1,15 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions, } from 'react-native';
+import { SignUpRequest } from '../axiosQuery/axiosRequest';
 
 const { width, height } = Dimensions.get('window');
 
-interface SignUpScreenProps {
-  navigation:{
-    navigate: (screen: string) => void;
-  }
-}
+export default function SignUpScreen({ navigation } : any) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
 
-export default function SignUpScreen({ navigation } : SignUpScreenProps) {
+  const accountCreation = async () => {
+    try {
+      const payload = {
+          full_name: name,
+          email : email,
+          password: password,
+          mobile_number: phone,
+      };
+
+      const res = await SignUpRequest(payload);
+      console.log(res.data);
+      navigation.navigate('Login');
+    } catch (err) {
+      console.log('Sign-up error:', err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -19,17 +36,21 @@ export default function SignUpScreen({ navigation } : SignUpScreenProps) {
 
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="First Name"
+          placeholder="Full Name"
           placeholderTextColor="#999"
           style={styles.input}
+          value = {name}
+          onChangeText={setName}
         />
       </View>
 
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Last Name"
+          placeholder="Phone Number"
           placeholderTextColor="#999"
           style={styles.input}
+          value = {phone}
+          onChangeText={setPhone}
         />
       </View>
 
@@ -39,6 +60,8 @@ export default function SignUpScreen({ navigation } : SignUpScreenProps) {
           placeholder="Email"
           placeholderTextColor="#999"
           style={styles.input}
+          value = {email}
+          onChangeText={setEmail}
         />
       </View>
 
@@ -49,6 +72,8 @@ export default function SignUpScreen({ navigation } : SignUpScreenProps) {
           placeholderTextColor="#999"
           style={styles.input}
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
 
@@ -62,7 +87,7 @@ export default function SignUpScreen({ navigation } : SignUpScreenProps) {
         />
       </View>
 
-      <TouchableOpacity style={styles.signUpButton}>
+      <TouchableOpacity style={styles.signUpButton} onPress={()=>accountCreation()}>
         <Text style={styles.signUpText}>Sign Up</Text>
       </TouchableOpacity>
 

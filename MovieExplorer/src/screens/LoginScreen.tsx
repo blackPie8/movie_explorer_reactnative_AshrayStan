@@ -1,15 +1,33 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions, Alert } from 'react-native';
+import { LoginRequest } from '../axiosQuery/axiosRequest';
 
 const { width, height } = Dimensions.get('window');
 
-interface LoginScreenProps {
-  navigation: {
-    navigate: (screen: string) => void;
-  }
-}
+export default function LoginScreen({navigation}: any) {
+  const [e_mail, setEmail] = useState('');
+  const [password,setPassword] = useState('');
 
-export default function LoginScreen({navigation}: LoginScreenProps) {
+  const accountValidation = async () => {
+    try {
+      const payload = {
+          email : e_mail,
+          password: password,
+      };
+
+      const res = await LoginRequest(payload);
+      const { email } = res.data.user
+      if(email === e_mail){
+      navigation.navigate('Dashboard');
+      }else{
+        Alert.alert('Login failed!')
+      }
+    } catch (err) {
+      console.log('Sign-up error:', err);
+      Alert.alert('Error!','Unable to login. Please try again later.')
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -23,6 +41,8 @@ export default function LoginScreen({navigation}: LoginScreenProps) {
           placeholder="Email"
           placeholderTextColor="#999"
           style={styles.input}
+          value={e_mail}
+          onChangeText={setEmail}
         />
       </View>
 
@@ -33,6 +53,8 @@ export default function LoginScreen({navigation}: LoginScreenProps) {
           placeholderTextColor="#999"
           style={styles.input}
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
 
@@ -46,7 +68,7 @@ export default function LoginScreen({navigation}: LoginScreenProps) {
         />
       </View>
 
-      <TouchableOpacity style={styles.signInButton}>
+      <TouchableOpacity style={styles.signInButton} onPress={()=> accountValidation()}>
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
 
