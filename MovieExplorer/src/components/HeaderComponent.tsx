@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity, TextInput, Image } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, TextInput, Image, FlatList } from 'react-native'
+import React, { useState, useEffect } from 'react'
 
 const { height, width } = Dimensions.get('window')
 

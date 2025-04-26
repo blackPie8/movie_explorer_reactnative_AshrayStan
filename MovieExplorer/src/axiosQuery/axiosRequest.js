@@ -23,3 +23,13 @@ export const LoginRequest = async (data) => {
     }
   );
 };
+
+export const GetMoviesData = async() => {
+  try{
+  const res = await axios.get('https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/movies')
+    return res.data.data
+  }catch(error){
+    console.log("Error fetching movies", error)
+    return null;
+  }
+  };
