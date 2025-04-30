@@ -5,6 +5,7 @@ const { height, width } = Dimensions.get('window')
 
 const HeaderComponent = () => {
   const [isGridView, setIsGridView] = useState(true)
+  
 
   const toggleView = () => {
     setIsGridView(prev => !prev)

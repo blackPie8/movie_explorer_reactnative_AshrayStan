@@ -60,6 +60,7 @@ const SliderComponent = ({ movies }) => {
     <View>
       <Animated.FlatList 
         ref={ref}
+        
         data={data}
         renderItem={({ item, index }) => <SliderItem item={item} index={index} scrollX={scrollX}/>}
         keyExtractor={(item, index) => index.toString()}

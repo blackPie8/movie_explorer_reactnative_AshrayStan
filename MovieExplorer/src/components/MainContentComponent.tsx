@@ -1,25 +1,15 @@
 import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { GetMoviesData } from '../axiosQuery/axiosRequest';
+// import { GetMoviesData } from '../axiosQuery/axiosRequest';
 import SliderComponent from './SliderComponent';
 import GenreFilterButtons from './GenreFilterButtons';
+import { useMovies } from '../context/MoviesContext';
 
 const { width, height } = Dimensions.get('window');
 
 const MainContentComponent = () => {
-  const [movies, setMovies] = useState([]);
-  const [filteredMovies, setFilteredMovies] = useState([]);
-  
-  const fetchMovies = async () => {
-    const data = await GetMoviesData();
-    console.log('Movies:', data);
-    setMovies(data);
-    setFilteredMovies(data);
-  };
 
-  useEffect(() => {
-    fetchMovies();
-  }, []);
+const { movies } = useMovies();
 
   return (
     <View>

@@ -1,11 +1,14 @@
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, { useState } from 'react';
 import { tabs } from '../constants/tabs';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const { height, width } = Dimensions.get('window');
 
 const FooterComponent = () => {
-  const [activeTab, setActiveTab] = useState('Home');
+  const navigation = useNavigation();
+  const route = useRoute();
+  const currentRoute = route.name;
 
   return (
     <View style={styles.container}>
@@ -13,19 +16,24 @@ const FooterComponent = () => {
         <TouchableOpacity
           key={tab.name}
           style={styles.tab}
-          onPress={() => setActiveTab(tab.name)}
+          onPress={() => {
+            if(tab.screens !== currentRoute){
+            navigation.navigate(tab.screens);
+            }
+          }}
+          
         >
           <Image
             source={tab.icon}
             style={[
               styles.icon,
-              { tintColor: activeTab === tab.name ? '#2563EB' : '#666' }
+              { tintColor: tab.screens === currentRoute ? '#2563EB' : '#666' }
             ]}
           />
           <Text
             style={[
               styles.label,
-              { color: activeTab === tab.name ? '#2563EB' : '#666' }
+              { color: tab.screens === currentRoute ? '#2563EB' : '#666' }
             ]}
           >
             {tab.name}

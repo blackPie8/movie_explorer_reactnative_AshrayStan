@@ -58,7 +58,7 @@ export default SliderItem;
 const styles = StyleSheet.create({
   container: {
     width: width * 0.9,
-    height: height * 0.15,
+    height: height * 0.25,
     borderRadius: 15,
     overflow: 'hidden',
     marginHorizontal: width * 0.025,
