@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
-// import { GetMoviesData } from '../axiosQuery/axiosRequest';
 import SliderComponent from './SliderComponent';
 import GenreFilterButtons from './GenreFilterButtons';
 import { useMovies } from '../context/MoviesContext';
@@ -16,7 +15,7 @@ const { movies } = useMovies();
       <Text style={styles.heading}>Featured</Text>
       {movies.length > 0 && (
         <SliderComponent movies={movies} />
-      )}
+       )}
       <View style = {styles.genreButtons}>
       <GenreFilterButtons movies={movies}/>
       </View>
@@ -29,11 +28,11 @@ export default MainContentComponent
 const styles = StyleSheet.create({
   heading: {
     fontSize: width * 0.05,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#000',
     marginLeft: width * 0.05,
     marginBottom: height * 0.01,
-    paddingTop: height* 0.03,
+    paddingTop: height* 0.02,
     paddingBottom: height*0.008
   },
   genreButtons:{

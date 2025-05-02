@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   bannerImg: {
     height: height * 0.3,
-    width: '100%',
+    width: width,
   },
   textCont: {
     paddingHorizontal: width * 0.028,
