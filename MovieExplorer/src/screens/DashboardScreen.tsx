@@ -9,7 +9,10 @@ const { height, width } = Dimensions.get('window');
 const DashboardScreen = () => {
   return (
     <View style={styles.mainContainer}>
-      <HeaderComponent />
+      <View style = {styles.searchStyle}>
+      <Text style={styles.title}>MovieExplor</Text>
+      <HeaderComponent showInput={false}/>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <MainContentComponent />
       </ScrollView>
@@ -30,5 +33,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
+  title: {
+    fontSize: width * 0.07,
+    fontWeight: 'bold',
+    color: '#000',
+    paddingHorizontal: width * 0.025,
+    paddingTop: height * 0.035,
+  },
+  searchStyle:{
+    marginBottom: height * 0.01
+  }
 });
 

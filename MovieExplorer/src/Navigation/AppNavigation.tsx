@@ -7,12 +7,11 @@ import DashboardScreen from '../screens/DashboardScreen';
 import { MoviesProvider } from '../context/MoviesContext';
 import PlansScreen from '../screens/PlansScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-<<<<<<< Updated upstream
 import ExploreScreen from '../screens/ExploreScreen';
-=======
 import SearchScreen from '../screens/SearchScreen';
 import MovieDetails from '../components/MovieDetails';
->>>>>>> Stashed changes
+import SearchScreen from '../screens/SearchScreen';
+import MovieDetails from '../components/MovieDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,12 +25,10 @@ export default function AppNavigation() {
         <Stack.Screen name="Dashboard" component={DashboardScreen} options={{headerShown: false}} />
         <Stack.Screen name="Plans" component={PlansScreen} options={{headerShown: false}} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{headerShown: false}} />
-<<<<<<< Updated upstream
-        <Stack.Screen name="Explore" component={ExploreScreen} options={{headerShown: false}} />
-=======
         <Stack.Screen name="Search" component={SearchScreen} options={{headerShown: false}} />
         <Stack.Screen name="MovieDetails" component={MovieDetails} options={{headerShown: false}} />
->>>>>>> Stashed changes
+        <Stack.Screen name="Search" component={SearchScreen} options={{headerShown: false}} />
+        <Stack.Screen name="MovieDetails" component={MovieDetails} options={{headerShown: false}} />
       </Stack.Navigator>
         </MoviesProvider>
     </NavigationContainer>

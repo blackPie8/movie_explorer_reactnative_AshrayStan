@@ -33,7 +33,7 @@ const SliderItem = ({ item, index, scrollX }) => {
   return (
     <Animated.View style={[styles.container, rnAnimatedStyle]}>
       <Image
-        source={require('../assets/movie1.jpg')}
+        source={{uri: item.banner_url}}
         style={styles.image}
       />
       <LinearGradient

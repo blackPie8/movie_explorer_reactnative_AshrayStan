@@ -1,37 +1,27 @@
 import React, { useState, useEffect, useContext, createContext} from 'react'
-<<<<<<< Updated upstream
-import { GetMoviesData } from '../axiosQuery/axiosRequest';
-=======
 import { GetMovieById, GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
->>>>>>> Stashed changes
 
 const MoviesContext = createContext();
 
 export const MoviesProvider = ({children}) => {
 const [movies, setMovies] = useState([])
 const [loading, setLoading] = useState(true)
-<<<<<<< Updated upstream
-
-=======
-const [apiGenre, setApiGenre] = useState('');
 const [filteredMovies, setFilteredMovies] = useState([])
 const [filById, setFilById] = useState([])
->>>>>>> Stashed changes
+const [apiGenre, setApiGenre] = useState('');
 
     const fetchMovies = async () => {
       try{
         setLoading(true)
       const data = await GetMoviesData();
       setMovies(data);
+      // console.log(data)
       } catch(error){
         console.log("Error fetching movies API", error)
       } finally{
         setLoading(false)
       }
     };
-<<<<<<< Updated upstream
-  
-=======
 
     const fetchMoviesByGenre = async () => {
       try{
@@ -58,22 +48,20 @@ const [filById, setFilById] = useState([])
       }
     }
 
->>>>>>> Stashed changes
     useEffect(() => {
       fetchMovies();
     }, []);
 
+    useEffect(()=> {
+        fetchMoviesByGenre();
+    },[apiGenre])
+
   return (
-<<<<<<< Updated upstream
-    <MoviesContext.Provider value={{ movies, loading, fetchMovies }}>
-=======
     <MoviesContext.Provider value={{ movies,filteredMovies, loading, setApiGenre, filById, fetchMoviesById }}>
->>>>>>> Stashed changes
       {children}
     </MoviesContext.Provider>
   )
 }
-
 export const useMovies = () => {
   return useContext(MoviesContext)
 }

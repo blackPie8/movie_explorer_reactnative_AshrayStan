@@ -26,15 +26,12 @@ export const LoginRequest = async (data) => {
 
 export const GetMoviesData = async() => {
   try{
-  const res = await axios.get('https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/movies')
-    return res.data.data
+  const res = await axios.get('https://movie-explorer-ror-aalekh-2ewg.onrender.com/api/v1/movies')
+    return res.data.movies
   }catch(error){
     console.log("Error fetching movies", error)
     return null;
   }
-<<<<<<< Updated upstream
-  };
-=======
   };
 
   export const GetMoviesByGenre = async(genre) => {
@@ -55,5 +52,4 @@ export const GetMovieById = async (id) =>{
     console.log("Error occured",err);
     return null;
   }
-};
->>>>>>> Stashed changes
+}

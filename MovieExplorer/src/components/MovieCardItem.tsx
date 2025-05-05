@@ -7,7 +7,7 @@ const MovieCardItem = ({ item }) => {
   return (
     <View style={styles.movieCard}>
       <Image
-        source={require("../assets/movie1.jpg")}
+        source={{uri:item.poster_url}}
         style={styles.movieImage}
         resizeMode="cover"
       />
