@@ -28,7 +28,7 @@ const SearchResultComponent = () => {
         numColumns={2}
         scrollEnabled={false}
         contentContainerStyle={styles.listContainer}
-      />
+      /> 
     </View>
   );
 };
