@@ -42,4 +42,14 @@ export const GetMoviesData = async() => {
       console.log("Error fetching genre", error)
       return null;
     }
+  };
+
+export const GetMovieById = async (id) =>{
+  try{
+    const res = await axios.get(`https://movie-explorer-ror-aalekh-2ewg.onrender.com/api/v1/movies/${id}`)
+    return res.data;
+  } catch(err) {
+    console.log("Error occured",err);
+    return null;
   }
+};

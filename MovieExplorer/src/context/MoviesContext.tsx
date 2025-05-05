@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, createContext} from 'react'
-import { GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
+import { GetMovieById, GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
 
 const MoviesContext = createContext();
 
@@ -8,6 +8,7 @@ const [movies, setMovies] = useState([])
 const [loading, setLoading] = useState(true)
 const [apiGenre, setApiGenre] = useState('');
 const [filteredMovies, setFilteredMovies] = useState([])
+const [filById, setFilById] = useState([])
 
     const fetchMovies = async () => {
       try{
@@ -34,7 +35,19 @@ const [filteredMovies, setFilteredMovies] = useState([])
         setLoading(false)
       }
     };
-  
+
+    const fetchMoviesById = async (movieId) => {
+      try{
+        const filteredById = await GetMovieById(movieId);
+        setFilById(filteredById)
+        console.log(filById)
+        setLoading(false);
+      } catch (error) {
+        console.log("Error Occured", error);
+        setLoading(false);
+      }
+    }
+
     useEffect(() => {
       fetchMovies();
     }, []);
@@ -44,7 +57,7 @@ const [filteredMovies, setFilteredMovies] = useState([])
     },[apiGenre])
 
   return (
-    <MoviesContext.Provider value={{ movies,filteredMovies, loading, setApiGenre }}>
+    <MoviesContext.Provider value={{ movies,filteredMovies, loading, setApiGenre, filById, fetchMoviesById }}>
       {children}
     </MoviesContext.Provider>
   )

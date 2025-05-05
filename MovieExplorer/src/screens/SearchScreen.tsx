@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions, Text, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, Text, FlatList, TouchableOpacity } from 'react-native';
 import GenreSearchResultComponent from '../components/GenreSearchResultComponent';
 import FooterComponent from '../components/FooterComponent';
 import SearchInputComponent from '../components/SearchInputComponent';
 import MovieCardItem from '../components/MovieCardItem';
+import { useNavigation } from '@react-navigation/native';
 
 const { height, width } = Dimensions.get('window')
 
 const SearchScreen = () => {
+  const navigation = useNavigation();
   const [isSearching, setIsSearching] = useState(false);
   const [filteredMovies, setFilteredMovies] = useState([]);
   return (
@@ -27,7 +29,11 @@ const SearchScreen = () => {
             <FlatList
               data={filteredMovies}
               keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => <MovieCardItem item={item} />}
+              renderItem={({ item }) => 
+              <TouchableOpacity onPress={()=>navigation.navigate('MovieDetails', {item})}>
+              <MovieCardItem item={item} />
+              </TouchableOpacity>
+              }
               numColumns={2}
               contentContainerStyle={{ padding: 10 }}
               scrollEnabled= {false}

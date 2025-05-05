@@ -1,16 +1,20 @@
-import { StyleSheet, Text, View, Dimensions, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useMovies } from '../context/MoviesContext';
 import FilterButtonTwo from './FilterButtonTwo';
 import MovieCardItem from './MovieCardItem';
+import { useNavigation } from '@react-navigation/native';
 
 const { height, width } = Dimensions.get('window');
 
 const SearchResultComponent = () => {
+  const navigation = useNavigation();
   const { filteredMovies } = useMovies();
 
-  const renderMovieItem = ({ item }) => <MovieCardItem item={item} />;
-
+  const renderMovieItem = ({ item }) =>
+  <TouchableOpacity onPress={()=>navigation.navigate('MovieDetails', {item})}>
+  <MovieCardItem item={item} />
+  </TouchableOpacity>
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Explore Your Interest</Text>

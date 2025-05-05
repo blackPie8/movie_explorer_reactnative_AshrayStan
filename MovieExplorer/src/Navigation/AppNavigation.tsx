@@ -8,6 +8,7 @@ import { MoviesProvider } from '../context/MoviesContext';
 import PlansScreen from '../screens/PlansScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SearchScreen from '../screens/SearchScreen';
+import MovieDetails from '../components/MovieDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ export default function AppNavigation() {
         <Stack.Screen name="Plans" component={PlansScreen} options={{headerShown: false}} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{headerShown: false}} />
         <Stack.Screen name="Search" component={SearchScreen} options={{headerShown: false}} />
+        <Stack.Screen name="MovieDetails" component={MovieDetails} options={{headerShown: false}} />
       </Stack.Navigator>
         </MoviesProvider>
     </NavigationContainer>

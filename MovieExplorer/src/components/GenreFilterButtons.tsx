@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import MovieCardItem from './MovieCardItem'
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const GenreFilterButtons = ({ movies }) => {
+  const navigation = useNavigation();
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [genres, setGenres] = useState(['All']);
@@ -29,7 +31,9 @@ const GenreFilterButtons = ({ movies }) => {
   }, [selectedGenre, movies]);
 
   const renderMovieItem = ({ item }) => (
+    <TouchableOpacity onPress={()=>navigation.navigate('MovieDetails', {item})}>
     <MovieCardItem item={item} />
+    </TouchableOpacity>
   );
 
   return (
