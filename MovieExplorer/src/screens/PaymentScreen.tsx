@@ -28,7 +28,7 @@ const PaymentScreen = () => {
     const currentUrl = navState.url;
     // console.log('Navigated to:', currentUrl);
 
-    if(currentUrl.includes('success')) {
+    if(currentUrl.includes('success')) { 
       console.log('Success URL reached:', currentUrl);
       setHasReachedSuccessUrl(true);
       
