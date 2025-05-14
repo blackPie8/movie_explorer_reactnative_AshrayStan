@@ -9,13 +9,20 @@ const [loading, setLoading] = useState(true)
 const [filteredMovies, setFilteredMovies] = useState([])
 const [filById, setFilById] = useState([])
 const [apiGenre, setApiGenre] = useState('');
+const [role, setRole] = useState('user')
+const [token, setToken] = useState('')
+const [page, setPage] = useState(1)
+const [allMovies, setAllMovies] = useState(movies)
+const [deviceToken, setDeviceToken] = useState('')
+const [isPremiumRestricted, setIsPremiumRestricted] = useState(true);
+const [username, setUsername] = useState('')
 
     const fetchMovies = async () => {
       try{
         setLoading(true)
-      const data = await GetMoviesData();
+      const data = await GetMoviesData(page);
       setMovies(data);
-      // console.log(data)
+      console.log(data)
       } catch(error){
         console.log("Error fetching movies API", error)
       } finally{
@@ -28,7 +35,7 @@ const [apiGenre, setApiGenre] = useState('');
         setLoading(true);
         const filteredGenre = await GetMoviesByGenre(apiGenre);
         setFilteredMovies(filteredGenre);
-        console.log(filteredGenre);
+        // console.log(filteredGenre);
       } catch(error) {
         console.log("Error fetching genre", error)
       } finally {
@@ -40,6 +47,7 @@ const [apiGenre, setApiGenre] = useState('');
       try{
         const filteredById = await GetMovieById(movieId);
         setFilById(filteredById)
+        setIsPremiumRestricted(false)
         console.log(filById)
         setLoading(false);
       } catch (error) {
@@ -57,7 +65,7 @@ const [apiGenre, setApiGenre] = useState('');
     },[apiGenre])
 
   return (
-    <MoviesContext.Provider value={{ movies,filteredMovies, loading, setApiGenre, filById, fetchMoviesById }}>
+    <MoviesContext.Provider value={{ movies,filteredMovies, loading, setApiGenre, filById, fetchMoviesById, role, setRole, token,  setToken, page, setPage, allMovies, setAllMovies, deviceToken, setDeviceToken, setIsPremiumRestricted, isPremiumRestricted, username, setUsername }}>
       {children}
     </MoviesContext.Provider>
   )

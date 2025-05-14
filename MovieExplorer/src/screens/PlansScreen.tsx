@@ -2,11 +2,24 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import { plans } from '../constants/plans';
 import FooterComponent from '../components/FooterComponent';
+import { useMovies } from '../context/MoviesContext';
+import { createSubscription } from '../axiosQuery/axiosRequest';
 
 const { width, height } = Dimensions.get('window');
 
 const PlansScreen = ({ navigation }: any) => {
+  const { token } = useMovies();
   const [selectedPlan, setSelectedPlan] = useState('Basic');
+
+   const handlePayment = async (planType:string)=>{
+    const res = await createSubscription(planType, token);
+    console.log(res);
+
+    const checkOutUrl = res.checkout_url;
+    const session = res.session_id;
+
+    navigation.navigate('Payment',{url:checkOutUrl,session:session});
+   }
 
   return (
     <View style={styles.container}>
@@ -53,6 +66,7 @@ const PlansScreen = ({ navigation }: any) => {
               <TouchableOpacity
                 style={[styles.button, isSelected && styles.currentButton]}
                 activeOpacity={0.8}
+                onPress={()=>{handlePayment(plan.planType)}}
               >
                 <Text
                   style={[

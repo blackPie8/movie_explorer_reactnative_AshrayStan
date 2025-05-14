@@ -3,28 +3,30 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
-import DashboardScreen from '../screens/DashboardScreen';
-import { MoviesProvider } from '../context/MoviesContext';
-import PlansScreen from '../screens/PlansScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import SearchScreen from '../screens/SearchScreen';
-import MovieDetails from '../components/MovieDetails';
+import { MoviesProvider, useMovies } from '../context/MoviesContext';
+import SupervisorStack from './SupervisorStack';
+import UserStack from './UserStack';
 
 const Stack = createNativeStackNavigator();
+
+function MainNavigator() {
+  const { role } = useMovies();
+  return (
+    <>
+    {role === 'supervisor' ? <SupervisorStack /> : <UserStack />}
+    </>
+  )
+}
 
 export default function AppNavigation() {
   return (
     <NavigationContainer>
           <MoviesProvider>
-      <Stack.Navigator initialRouteName="Dashboard">
-        <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
-        <Stack.Screen name="SignUp" component={SignUpScreen} options={{headerShown: false}} />
-        <Stack.Screen name="Dashboard" component={DashboardScreen} options={{headerShown: false}} />
-        <Stack.Screen name="Plans" component={PlansScreen} options={{headerShown: false}} />
-        <Stack.Screen name="Profile" component={ProfileScreen} options={{headerShown: false}} />
-        <Stack.Screen name="Search" component={SearchScreen} options={{headerShown: false}} />
-        <Stack.Screen name="MovieDetails" component={MovieDetails} options={{headerShown: false}} />
-      </Stack.Navigator>
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='SignUp'>
+          <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="SignUp" component={SignUpScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="Main" component={MainNavigator} />
+        </Stack.Navigator>
         </MoviesProvider>
     </NavigationContainer>
   );

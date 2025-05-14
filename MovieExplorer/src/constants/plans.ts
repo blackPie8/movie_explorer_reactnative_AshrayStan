@@ -5,6 +5,7 @@ export const plans = [
     features: ['HD streaming', 'Watch on 2 devices', 'Cancel anytime'],
     isCurrent: true,
     isPopular: false,
+    planType: "basic"
   },
   {
     title: 'Premium',
@@ -12,6 +13,7 @@ export const plans = [
     features: ['4K streaming', 'Watch on 4 devices', 'Download for offline viewing'],
     isCurrent: false,
     isPopular: true,
+    planType: "premium"
   },
   {
     title: 'Ultimate',
@@ -19,5 +21,6 @@ export const plans = [
     features: ['4K streaming', 'Watch on 6 devices', 'Download for offline viewing', 'Ad-free experience'],
     isCurrent: false,
     isPopular: false,
+    planType: "premium"
   },
 ];

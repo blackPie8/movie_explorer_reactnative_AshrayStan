@@ -1,23 +1,32 @@
 import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import HeaderComponent from '../components/HeaderComponent'
 import FooterComponent from '../components/FooterComponent'
 import MainContentComponent from '../components/MainContentComponent'
+import Notifications from '../pushNotification/notifications'
 
 const { height, width } = Dimensions.get('window');
 
 const DashboardScreen = () => {
   return (
-    <View style={styles.mainContainer}>
-      <View style = {styles.searchStyle}>
-      <Text style={styles.title}>MovieExplor</Text>
-      <HeaderComponent showInput={false}/>
-      </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <MainContentComponent />
-      </ScrollView>
-      <FooterComponent />
-    </View>
+<View style={styles.mainContainer}>
+  <Notifications />
+  
+  <View style={styles.searchStyle} testID="search-container">
+    <Text style={styles.title} testID="dashboard-title">MovieExplor</Text>
+    <HeaderComponent showInput={false} />
+  </View>
+
+  <ScrollView
+    contentContainerStyle={styles.scrollContent}
+    showsVerticalScrollIndicator={false}
+    testID="scroll-view"
+  >
+    <MainContentComponent />
+  </ScrollView>
+
+  <FooterComponent />
+</View>
   )
 }
 
@@ -44,4 +53,3 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.01
   }
 });
-

@@ -1,8 +1,8 @@
-import { View, Text } from 'react-native'
-import React from 'react'
 import AppNavigation from './src/Navigation/AppNavigation'
+import React, { useEffect } from 'react'
 
 const App = () => {
+
   return (
     <AppNavigation />
   )

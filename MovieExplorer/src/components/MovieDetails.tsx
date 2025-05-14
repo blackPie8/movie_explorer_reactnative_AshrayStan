@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Dimensions, ActivityIndicator, ScrollView, Image, TouchableOpacity, } from 'react-native';
+import {
+  View, Text, StyleSheet, ImageBackground, Dimensions,
+  ActivityIndicator, ScrollView, Image, TouchableOpacity
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useMovies } from '../context/MoviesContext';
 
@@ -7,18 +10,22 @@ const { height, width } = Dimensions.get('window');
 
 const MovieDetails = ({ route, navigation }) => {
   const { item } = route.params;
-  const { fetchMoviesById, filById, loading } = useMovies();
+  const { fetchMoviesById, filById, isPremiumRestricted } = useMovies();
 
   useEffect(() => {
     fetchMoviesById(item.id);
   }, [item.id]);
 
-  if (loading || !filById) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#2563EB" />
-      </View>
-    );
+  // Safe redirection in useEffect
+  useEffect(() => {
+    if (isPremiumRestricted || filById === null) {
+      navigation.replace('Plans');
+    }
+  }, [isPremiumRestricted, filById]);
+
+  // Prevent render before redirection
+  if (isPremiumRestricted || filById === null) {
+    return null;
   }
 
   return (
@@ -98,7 +105,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   infoContainer: {
-    paddingBottom: height * 0.04,
+    paddingBottom: height * 0.0,
   },
   title: {
     fontSize: width * 0.065,

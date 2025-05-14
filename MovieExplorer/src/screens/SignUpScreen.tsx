@@ -5,7 +5,8 @@ import { SignUpRequest } from '../axiosQuery/axiosRequest';
 const { width, height } = Dimensions.get('window');
 
 export default function SignUpScreen({ navigation } : any) {
-  const [name, setName] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('')
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -13,10 +14,13 @@ export default function SignUpScreen({ navigation } : any) {
   const accountCreation = async () => {
     try {
       const payload = {
-          full_name: name,
+        user : {
           email : email,
           password: password,
+          first_name: firstname,
+          last_name: lastname,
           mobile_number: phone,
+        }
       };
 
       const res = await SignUpRequest(payload);
@@ -36,11 +40,21 @@ export default function SignUpScreen({ navigation } : any) {
 
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Full Name"
+          placeholder="First Name"
           placeholderTextColor="#999"
           style={styles.input}
-          value = {name}
-          onChangeText={setName}
+          value = {firstname}
+          onChangeText={setFirstname}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Last Name"
+          placeholderTextColor="#999"
+          style={styles.input}
+          value = {lastname}
+          onChangeText={setLastname}
         />
       </View>
 
@@ -108,7 +122,7 @@ export default function SignUpScreen({ navigation } : any) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: height * 0.08,
+    paddingTop: height * 0.04,
     paddingHorizontal: width * 0.06,
     alignItems: 'center',
     flex: 1,

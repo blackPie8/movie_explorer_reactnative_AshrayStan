@@ -1,29 +1,40 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions, Alert } from 'react-native';
 import { LoginRequest } from '../axiosQuery/axiosRequest';
+import { useMovies } from '../context/MoviesContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen({navigation}: any) {
+  const { role, setRole, setToken, setUsername } = useMovies();
+
   const [e_mail, setEmail] = useState('');
   const [password,setPassword] = useState('');
 
   const accountValidation = async () => {
     try {
+      // debugger;
       const payload = {
           email : e_mail,
           password: password,
-      };
-
-      const res = await LoginRequest(payload);
-      const { email } = res.data.user
-      if(email === e_mail){
-      navigation.navigate('Dashboard');
-      }else{
-        Alert.alert('Login failed!')
       }
-    } catch (err) {
-      console.log('Sign-up error:', err);
+
+      const res: any = await LoginRequest(payload);
+      // console.log(res);
+      const { user, token } = res.data
+      // console.log(user.email)
+      if(user.email === e_mail){
+        setRole(user.role);
+        setUsername(user.first_name)
+        setToken(token);
+        // console.log(token)
+      navigation.navigate('Main');
+      }else{
+        Alert.alert('Invalid email or password!')
+      }
+    } catch (err: any) {
+      // debugger;
+      console.log('Login error:', err.response);
       Alert.alert('Error!','Unable to login. Please try again later.')
     }
   };
@@ -55,16 +66,6 @@ export default function LoginScreen({navigation}: any) {
           secureTextEntry
           value={password}
           onChangeText={setPassword}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Image source={require('../assets/role.png')} style={styles.icon} />
-        <TextInput
-          placeholder="Select role"
-          placeholderTextColor="#999"
-          style={styles.input}
-          secureTextEntry
         />
       </View>
 

@@ -1,61 +1,119 @@
-import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import MovieCardItem from './MovieCardItem'
+import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import MovieCardItem from './MovieCardItem';
 import { useNavigation } from '@react-navigation/native';
+import { useMovies } from '../context/MoviesContext';
+import { GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
 
 const { width, height } = Dimensions.get('window');
 
-const GenreFilterButtons = ({ movies }) => {
+const GenreFilterButtons = () => {
+  const { movies } = useMovies();
   const navigation = useNavigation();
+
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [filteredMovies, setFilteredMovies] = useState([]);
-  const [genres, setGenres] = useState(['All']);
+  const [allMovies, setAllMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const genres = ['All', 'Action', 'Comedy', 'Sci-Fi', 'Thriller', 'Crime'];
 
   useEffect(() => {
-    if (movies.length > 0) {
-      const uniqueGenres = Array.from(new Set(movies.map(movie => movie.genre)));
-      setGenres(['All', ...uniqueGenres]);
-      setFilteredMovies(movies);
-    }
+    setAllMovies(movies);
+    setFilteredMovies(movies);
   }, [movies]);
 
-  useEffect(() => {
-    if (selectedGenre === 'All') {
+  const handleGenreSelect = async (genre) => {
+    setSelectedGenre(genre);
+    setPage(1);
+    setHasMore(true);
+    setLoading(true);
+
+    if (genre === 'All') {
       setFilteredMovies(movies);
+      setAllMovies(movies);
     } else {
-      const filtered = movies.filter(
-        (movie) => movie.genre?.toLowerCase() === selectedGenre.toLowerCase()
-      );
-      setFilteredMovies(filtered);
+      try {
+        const genreMovies = await GetMoviesByGenre(genre);
+        setFilteredMovies(genreMovies);
+        setAllMovies(genreMovies);
+        if (genreMovies.length < 10) setHasMore(false);
+      } catch (error) {
+        console.log("Error fetching movies by genre:", error);
+      }
     }
-  }, [selectedGenre, movies]);
+
+    setLoading(false);
+  };
+
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    const fetchMoreMovies = async () => {
+      setLoading(true);
+      const newMovies = await GetMoviesData(page);
+
+      if (newMovies && newMovies.length > 0) {
+        const combined = [...allMovies, ...newMovies];
+        const uniqueMovies = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        setAllMovies(uniqueMovies);
+
+        const updatedFiltered =
+          selectedGenre === 'All'
+            ? uniqueMovies
+            : uniqueMovies.filter(
+                (movie) => movie.genre?.toLowerCase() === selectedGenre.toLowerCase()
+              );
+
+        setFilteredMovies(updatedFiltered);
+
+        if (newMovies.length < 10) setHasMore(false);
+      } else {
+        setHasMore(false);
+      }
+
+      setLoading(false);
+    };
+
+    if (page > 1) {
+      fetchMoreMovies();
+    }
+  }, [page]);
 
   const renderMovieItem = ({ item }) => (
-    <TouchableOpacity onPress={()=>navigation.navigate('MovieDetails', {item})}>
-    <MovieCardItem item={item} />
+    <TouchableOpacity onPress={() => navigation.navigate('MovieDetails', { item })}>
+      <MovieCardItem item={item} />
     </TouchableOpacity>
   );
 
   return (
     <View>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
         style={styles.genreScroll}
       >
         {genres.map((genre) => (
           <TouchableOpacity
             key={genre}
-            onPress={() => setSelectedGenre(genre)}
+            onPress={() => handleGenreSelect(genre)}
             style={[
               styles.genreButton,
-              selectedGenre === genre && styles.selectedGenreButton
+              selectedGenre === genre && styles.selectedGenreButton,
             ]}
           >
-            <Text style={[
-              styles.genreButtonText,
-              selectedGenre === genre && styles.selectedGenreButtonText
-            ]}>
+            <Text
+              style={[
+                styles.genreButtonText,
+                selectedGenre === genre && styles.selectedGenreButtonText,
+              ]}
+            >
               {genre}
             </Text>
           </TouchableOpacity>
@@ -64,20 +122,37 @@ const GenreFilterButtons = ({ movies }) => {
 
       <Text style={styles.trendingText}>Trending Now</Text>
 
-      <FlatList
-        data={filteredMovies}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderMovieItem}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={{ paddingBottom: height * 0.1 }}
-        scrollEnabled={false}
-      />
+      {loading && page === 1 ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={filteredMovies}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          renderItem={renderMovieItem}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.contentScroll}
+          scrollEnabled={false}
+          ListFooterComponent={
+            hasMore ? (
+              loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <TouchableOpacity onPress={loadMore} style={styles.loadMoreButton}>
+                  <Text style={styles.loadMoreText}>Load More</Text>
+                </TouchableOpacity>
+              )
+            ) : (
+              <Text style={styles.endText}>Oops, You scrolled too far</Text>
+            )
+          }
+        />
+      )}
     </View>
-  )
-}
+  );
+};
 
-export default GenreFilterButtons
+export default GenreFilterButtons;
 
 const styles = StyleSheet.create({
   genreScroll: {
@@ -115,4 +190,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginBottom: height * 0.02,
   },
+  contentScroll: {
+    paddingBottom: height * 0.02
+  },
+  loadMoreButton: {
+    backgroundColor: '#2563EB',
+    alignSelf: 'center',
+    marginBottom: height * 0.025,
+    paddingVertical: height * 0.005,
+    paddingHorizontal: width * 0.05,
+    borderRadius: width * 0.02,
+  },
+  loadMoreText: {
+    color: 'white',
+    fontSize: width * 0.04,
+    fontWeight: '600'
+  },
+  endText: {
+    textAlign: 'center',
+    marginBottom: height * 0.01,
+    fontSize: width * 0.035,
+    fontWeight: '500',
+    color: '#404245'
+  }
 });

@@ -1,11 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { LogoutRequest } from '../axiosQuery/axiosRequest';
+import { useMovies } from '../context/MoviesContext';
 
 const { width, height } = Dimensions.get('window');
 
 const ProfileSettings = () => {
     const navigation = useNavigation();
+      const { token } = useMovies();
+
+     const handelSignOut = async() => {
+    const res = await LogoutRequest(token);
+    console.log(res.data);
+   }
+
   return (
     <View>
       <View style={styles.section}>
@@ -42,10 +51,17 @@ const ProfileSettings = () => {
           { label: 'Terms of Service', icon: require('../assets/terms-and-conditions.png') },
           { label: 'Log Out', icon: require('../assets/logout.png'), isDanger: true },
         ].map((item, index) => (
-          <TouchableOpacity key={index} onPress={()=>navigation.replace('Login')}>
+          <TouchableOpacity key={index} 
+          onPress={ async()=> {
+            await handelSignOut();
+
+            if(item.isDanger){
+            navigation.replace('Login') 
+            }
+          }}>
           <View style={styles.settingItem}>
-            <Image source={item.icon} style={styles.iconSetting} />
-            <Text style={[styles.settingText, item.isDanger && { color: 'red' }]}>
+            <Image source={item.icon} style={[ styles.iconSetting, item.isDanger && {tintColor: '#eb2323'} ]} />
+            <Text style={[styles.settingText, item.isDanger && { color: '#eb2323' }]}>
               {item.label}
             </Text>
           </View>
@@ -98,7 +114,7 @@ const styles = StyleSheet.create({
     width: width * 0.05,
     height: width * 0.05,
     marginRight: width * 0.03,
-    tintColor: '#2563EB',
+    tintColor: '#4e524f',
   },
   settingText: {
     fontSize: width * 0.04,

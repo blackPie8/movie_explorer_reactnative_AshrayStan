@@ -1,23 +1,36 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { useMovies } from '../context/MoviesContext';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const ProfileHeader = () => {
+  const { role, username } = useMovies();
+    const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <Image
         source={require('../assets/user.png')}
         style={styles.avatar}
       />
-      <Text style={styles.name}>Sydney Sweeney</Text>
+      <Text style={styles.name}>Hi, {username}</Text>
       <View style={styles.roleContainer}>
-        <Text style={styles.roleText}>User</Text>
+        <Text style={styles.roleText}>{role}</Text>
       </View>
-      <TouchableOpacity style={styles.editButton}>
+
+      { role === 'supervisor' ? (
+      <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate('Supervisor')}>
+        <Image source={require('../assets/pen.png')} style={styles.iconSmall} />
+        <Text style={styles.editText}>Add Movie</Text>
+      </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.editButton}>
         <Image source={require('../assets/pen.png')} style={styles.iconSmall} />
         <Text style={styles.editText}>Edit Profile</Text>
       </TouchableOpacity>
+      )
+      }
 
       <View style={styles.statsContainer}>
         <View style={styles.stat}>
@@ -74,7 +87,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.035,
     paddingVertical: height * 0.01,
     borderRadius: width * 0.025,
-    borderColor: '#2563EB',
+    borderColor: '#4e524f',
     marginTop: height * 0.015,
   },
   editText: {

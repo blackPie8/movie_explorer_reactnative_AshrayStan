@@ -1,16 +1,46 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useMovies } from '../context/MoviesContext';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const MovieCardItem = ({ item }) => {
+    const { role } = useMovies();
+    const isSupervisor = role === 'supervisor'
+      const navigation = useNavigation();
+
+    const handleEditClick = (movieId) => {
+      navigation.navigate('Supervisor',{movieId, isEditing : true})
+    }
+
   return (
     <View style={styles.movieCard}>
       <Image
         source={{uri:item.poster_url}}
-        style={styles.movieImage}
+        style={[styles.movieImage, 
+          item.premium && { borderColor: 'gold', borderWidth: 3 }
+        ]}
         resizeMode="cover"
       />
+      { item.premium && (
+        <View style = {styles.premiumCont}>
+      <Text style = {styles.premiumText}>PREMIUM</Text>
+      </View>
+      )
+      }
+      {
+        isSupervisor && (
+          <View style = {styles.iconCont}>
+            <TouchableOpacity onPress={() => handleEditClick(item.id)}>
+            <Image source={require('../assets/pen.png')} style = {styles.penImg}/>
+            </TouchableOpacity>
+            <TouchableOpacity>
+            <Image source={require('../assets/trash-bin.png')} style = {styles.trashIcon} />
+            </TouchableOpacity>
+          </View>
+      )
+    }
       <Text style={styles.movieTitle} numberOfLines={1}>
         {item.title}
       </Text>
@@ -44,6 +74,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: width * 0.04,
     borderTopRightRadius: width * 0.04,
     borderRadius: width * 0.04,
+    
   },
   movieTitle: {
     fontSize: width * 0.04,
@@ -77,5 +108,34 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
   },
+  penImg: {
+    height : height * 0.02,
+    width : width * 0.05,
+    tintColor: '#fff'
+  },
+  iconCont:{
+    position: 'absolute',
+    top: 10,
+    right: 20,
+    gap: 100,
+    flexDirection: 'row'
+  },
+  trashIcon:{
+    height : height * 0.02,
+    width : width * 0.05,
+    tintColor: '#fff'
+  },
+  premiumText:{
+    fontWeight: '600',
+    padding: 5
+  },
+  premiumCont:{
+    backgroundColor: 'gold',
+    position: 'absolute',
+    bottom: 62,
+    left: 50,
+    borderTopStartRadius: 10,
+    borderTopEndRadius: 10
+  }
 });
 
