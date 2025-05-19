@@ -7,6 +7,7 @@ import SearchScreen from '../screens/SearchScreen';
 import MovieDetails from '../components/MovieDetails';
 import StripeCheckoutComponent from '../components/StripeCheckoutComponent';
 import PaymentScreen from '../screens/PaymentScreen';
+import PaymentGatewayScreen from '../screens/PaymentGatewayScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function UserStack() {
         <Stack.Screen name="MovieDetails" component={MovieDetails} options={{headerShown: false}} />
         <Stack.Screen name="Stripe" component={StripeCheckoutComponent} options={{headerShown: false}} />
         <Stack.Screen name="Payment" component={PaymentScreen} options={{headerShown: false}} />
+         <Stack.Screen name="PaymentGateway" component={PaymentGatewayScreen} options={{headerShown: false}} />
       </Stack.Navigator>
   );
 }

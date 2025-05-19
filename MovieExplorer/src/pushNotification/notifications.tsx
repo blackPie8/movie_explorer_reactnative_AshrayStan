@@ -15,7 +15,7 @@ const Notifications = () => {
 
   useEffect(() => {
     const unsubscribe = onMessage(getMessaging(getApp()), async remoteMessage => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       onDisplayNotification(remoteMessage);
     });
 
@@ -63,7 +63,7 @@ const Notifications = () => {
       body: remoteMessage?.notification?.body,
       android: {
         channelId,
-        // smallIcon: 'ic_launcher',
+        smallIcon: 'ic_launcher',
         pressAction: {
           id: 'default',
         },

@@ -1,26 +1,16 @@
 export const plans = [
   {
+    planType: 'basic',
     title: 'Basic',
     price: '$9.99',
-    features: ['HD streaming', 'Watch on 2 devices', 'Cancel anytime'],
-    isCurrent: true,
+    features: ['Access to all movies', 'Standard quality', '1 device'],
     isPopular: false,
-    planType: "basic"
   },
   {
+    planType: 'premium',
     title: 'Premium',
     price: '$14.99',
-    features: ['4K streaming', 'Watch on 4 devices', 'Download for offline viewing'],
-    isCurrent: false,
+    features: ['Access to all movies', 'HD quality', '3 devices'],
     isPopular: true,
-    planType: "premium"
-  },
-  {
-    title: 'Ultimate',
-    price: '$19.99',
-    features: ['4K streaming', 'Watch on 6 devices', 'Download for offline viewing', 'Ad-free experience'],
-    isCurrent: false,
-    isPopular: false,
-    planType: "premium"
   },
 ];

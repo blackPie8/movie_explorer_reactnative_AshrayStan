@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 
 const ProfileHeader = () => {
-  const { role, username } = useMovies();
+  const { role, username, currentPlan } = useMovies();
     const navigation = useNavigation();
   return (
     <View style={styles.container}>

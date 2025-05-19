@@ -1,9 +1,11 @@
 import axios from 'axios';
-import { useMovies } from '../context/MoviesContext';
+import { Alert } from 'react-native';
+
+const BASE_URL = 'https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1';
 
 export const SignUpRequest = async (data) => {
   const res = await axios.post(
-    'https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/users',
+    `${BASE_URL}`,
     data,
     {
       headers: {
@@ -19,7 +21,7 @@ export const SignUpRequest = async (data) => {
 export const LoginRequest = async (data) => {
   try {
     const res = await axios.post(
-      'https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/users/sign_in',
+      `${BASE_URL}/users/sign_in`,
       data,
       {
         headers: {
@@ -30,7 +32,7 @@ export const LoginRequest = async (data) => {
     );
     return res;
   } catch (err) {
-    console.error("error", err.response);
+    // console.error("error", err.response);
     throw err;
   }
 };
@@ -38,7 +40,7 @@ export const LoginRequest = async (data) => {
 export const LogoutRequest = async (user_token) => {
   try {
   return await axios.delete(
-    'https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/users/sign_out',
+    `${BASE_URL}/users/sign_out`,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ export const LogoutRequest = async (user_token) => {
 
 export const GetMoviesData = async( pageNum ) => {
   try{
-  const res = await axios.get(`https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/movies?page=${pageNum}`)
+  const res = await axios.get(`${BASE_URL}/movies?page=${pageNum}`)
     return res.data.movies
   }catch(error){
     console.log("Error fetching movies", error.response)
@@ -64,7 +66,7 @@ export const GetMoviesData = async( pageNum ) => {
 
   export const GetMoviesByGenre = async(genre) => {
     try{
-      const res = await axios.get(`https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/movies?genre=${genre}`)
+      const res = await axios.get(`${BASE_URL}/movies?genre=${genre}`)
       return res.data.movies
     } catch (error) {
       console.log("Error fetching genre", error)
@@ -73,27 +75,60 @@ export const GetMoviesData = async( pageNum ) => {
   };
 
 
-export const GetMovieById = async (id) =>{
+export const GetMovieById = async (id, token) =>{
   try{
-    const res = await axios.get(`https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/movies/${id}`)
-
-        if (res.status === 403) {
-      setFilById(null);
-      setIsPremiumRestricted(true);
-      return;
+    const res = await axios.get(`${BASE_URL}/movies/${id}`, 
+      {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Accept': 'application/json',
+      }
     }
+    );
+    //     if (res.status === 403) {
+    //   setFilById(null);
+    //   setIsPremiumRestricted(true);
+    //   return;
+    // }
 
     return res.data;
   } catch(err) {
-    console.log("Error occured",err.response);
+    console.log("Error occured",err);
     return null;
   }
 }
 
+// Exlore Page
+
+export const searchMovies = async (title) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/movies`, {
+      params: { title },
+    });
+    return res.data.movies || [];
+  } catch (error) {
+    console.error("Search error:", error?.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getSuggestions = async (title) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/movies`, {
+      params: { title },
+    });
+    return res.data.movies || [];
+  } catch (error) {
+    console.error("Suggestion fetch error:", error?.response?.data || error.message);
+    throw error;
+  }
+};
+
 
 export const AddNewMovie = async(formData, token) => {
   try{
-    const res = await axios.post('https://movie-explorer-app.onrender.com/api/v1/movies', 
+    const res = await axios.post(`${BASE_URL}/movies`, 
       formData,
       {
       headers: {
@@ -114,7 +149,7 @@ export const AddNewMovie = async(formData, token) => {
 export const addDeviceNotification = async (device_token, user_token) => {
   try {
     const res = await axios.patch(
-      'https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/users/update_device_token',
+      `${BASE_URL}/users/update_device_token`,
       { device_token },
       {
         headers: {
@@ -135,33 +170,10 @@ export const addDeviceNotification = async (device_token, user_token) => {
 };
 
 
-// export const enableNotification = async (user_token) => {
-//   try {
-//     const res = await axios.patch(
-//       'https://movie-explorer-app.onrender.com/api/v1/toggle_notifications',
-//       null,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${user_token}` ,
-//         },
-//       }
-//     );
-//     console.log(res.data);
-//     return res;
-//   } catch (error) {
-//     console.error(
-//       'enabling/disabling notification error:',
-//       error.res?.data || error.message || error
-//     );
-//     throw error;
-//   }
-// };
-
-
 export const UpdateMovieRequest = async (id, formData, token) => {
   try {
     const res = await axios.patch(
-      `https://movie-explorer-app.onrender.com/api/v1/movies/${id}`,
+      `${BASE_URL}/movies/${id}`,
       formData,
       {
         headers: {
@@ -179,39 +191,37 @@ export const UpdateMovieRequest = async (id, formData, token) => {
 };
 
 
-export const createSubscription = async (planType,token) => {
+export const createSubscription = async (planType, token) => {
   try {
     if (!token) {
       throw new Error('No authentication token provided');
     }
 
     const response = await axios.post(
-      "https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/subscriptions",
-      {plan_id: planType,
-        // platform:"mobile"
-      },
+      `${BASE_URL}/subscriptions`,
+      { plan_id: planType },
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` ,
+          Authorization: `Bearer ${token}`,
         },
-      },
+      }
     );
 
-    console.log('API Response:', response);
+    console.log('API Response:', response.data);
 
     if (response.data.error) {
       throw new Error(response.data.error);
     }
 
-    const checkoutUrl =
-      response.data.checkout_url;
+    const paymentIntentId = response.data.payment_intent_id;
+    const clientSecret = response.data.client_secret;
 
-    if (!checkoutUrl) {
-      throw new Error('No checkout URL returned from server.');
+    if (!paymentIntentId) {
+      throw new Error('No payment intent ID returned from server.');
     }
 
-    return response.data;
+    return { payment_intent_id: paymentIntentId, client_secret: clientSecret };
   } catch (error) {
     console.error('Error creating subscription:', error);
     throw new Error(error.message || 'Failed to initiate subscription');
@@ -219,20 +229,84 @@ export const createSubscription = async (planType,token) => {
 };
 
 
-export const checkSubscriptionStatus = async(user_token)=>{
+export const confirmSubscription = async (paymentIntentId, token) => {
   try {
-    const res = await axios.get("https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1/subscriptions/webhook",
-     {
-      headers : {
-        'Content-Type' : 'application/json',
-        Authorization : `Bearer ${user_token}`,
+    if (!token) {
+      throw new Error('No authentication token provided');
+    }
+
+    const response = await axios.post(
+      `${BASE_URL}/subscriptions/confirm`,
+      { payment_intent_id: paymentIntentId },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       }
-     }
-    )
-    return res;
-    
+    );
+
+    console.log('confirmSubscription: Response:', response.data);
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+
+    return response;
   } catch (error) {
-    console.log("some error occured",err);
+    console.error('confirmSubscription: Error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers,
+    });
+    throw new Error(error.message || 'Failed to confirm subscription');
+  }
+};
+
+
+
+export const checkSubscriptionStatus = async (user_token) => {
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/subscriptions/status`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user_token}`,
+        },
+      }
+    );
+
+    console.log('Subscription Status Response:', res.data);
+    return res;
+  } catch (error) {
+    console.error('Error checking subscription status:', error);
     return null;
-  };
-}
+  }
+};
+
+
+export const deleteExistingMovie = async (id, token) => {
+  try {
+    if (!token) {
+      Alert.alert('You need to sign in first.');
+      throw new Error('No authentication token found');
+    }
+
+    await axios.delete(
+      `${BASE_URL}/movies/${id}`,
+      {
+      headers: {
+        Authorization: `Bearer ${token}` ,
+        Accept: 'application/json',
+      },
+    });
+
+    // Alert.alert('Movie deleted successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error deleting movie:', error.message, error.response?.data);
+    Alert.alert(error.response?.data?.error || 'Failed to delete movie');
+    return false;
+  }
+};

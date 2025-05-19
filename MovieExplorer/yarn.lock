@@ -2291,10 +2291,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@stripe/stripe-react-native@^0.45.0":
-  version "0.45.0"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-react-native/-/stripe-react-native-0.45.0.tgz#e0e45e20f35f7dd7a13b4a7baecd6abc91796d65"
-  integrity sha512-7ebzpzkbTrlSfwHJkxv2ixP+YhrF7rLncIr0Sxk6iOeVarB1rOoURWlLRf+Yy5G5OJYjgZDVSVpITcOddtgAVw==
+"@stripe/stripe-react-native@^0.46.0":
+  version "0.46.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-react-native/-/stripe-react-native-0.46.0.tgz#c2b2de3d46b06356dc5b5bce7cd265c31585e058"
+  integrity sha512-bF3ek6hHPPGmXYBsQRg45zb0IHW1C3MP4E/ylSJ+JK/A9XvJCDfHVdfQeZ3OGbf9WAIOu90rgqkhyka5xkOBZA==
 
 "@testing-library/jest-native@^5.4.3":
   version "5.4.3"

@@ -17,7 +17,7 @@ const { movies } = useMovies();
         <SliderComponent movies={movies} />
        )}
       <View style = {styles.genreButtons}>
-      <GenreFilterButtons movies={movies}/>
+      <GenreFilterButtons />
       </View>
     </View>
   )

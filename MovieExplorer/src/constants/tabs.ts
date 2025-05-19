@@ -11,4 +11,5 @@ export const genre = [
   {name: 'Thriller', icon: require('../assets/thriller.jpg')},
   {name: 'Crime', icon: require('../assets/crime.jpg')},
   {name: 'Comedy', icon: require('../assets/comedy.jpg')},
+  {name: 'War', icon: require('../assets/war.jpg')},
 ]

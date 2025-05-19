@@ -9,10 +9,10 @@ const { height, width } = Dimensions.get('window');
 
 const SearchResultComponent = () => {
   const navigation = useNavigation();
-  const { filteredMovies } = useMovies();
+  const { filteredMovies, handleMoviePress } = useMovies();
 
   const renderMovieItem = ({ item }) =>
-  <TouchableOpacity onPress={()=>navigation.navigate('MovieDetails', {item})}>
+  <TouchableOpacity onPress={() => handleMoviePress(item)}>
   <MovieCardItem item={item} />
   </TouchableOpacity>
   return (

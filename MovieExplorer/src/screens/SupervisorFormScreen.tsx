@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, ScrollView, Platform, StatusBar, ActivityIndicator, Alert, KeyboardAvoidingView,TouchableOpacity, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView, Platform, StatusBar, ActivityIndicator, Alert, KeyboardAvoidingView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -12,7 +12,7 @@ const SupervisorFormScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { movieId, isEditing } = route.params || {};
-  const { token } = useMovies();
+  const { token, fetchMovies } = useMovies();
 
   const [loading, setLoading] = useState(false);
   const [movieData, setMovieData] = useState({
@@ -33,7 +33,7 @@ const SupervisorFormScreen = () => {
   const [existingBannerUrl, setExistingBannerUrl] = useState(null);
 
   useEffect(() => {
-                      console.log(token)
+    console.log(token);
     if (isEditing && movieId && token) {
       const fetchMovieData = async () => {
         setLoading(true);
@@ -93,11 +93,28 @@ const SupervisorFormScreen = () => {
       'description',
     ];
     const missing = required.filter(f => !movieData[f]);
+
+    const year = Number(movieData.release_year);
+    const rating = Number(movieData.rating);
+
+    let validationErrors = [];
+
     if (missing.length || (!isEditing && (!poster || !banner))) {
-      Alert.alert(
-        'Missing fields',
-        [...missing, !poster && 'poster', !banner && 'banner'].filter(Boolean).join(', ')
-      );
+      validationErrors = [...missing];
+      if (!poster && !isEditing) validationErrors.push('poster');
+      if (!banner && !isEditing) validationErrors.push('banner');
+    }
+
+    if (year < 1800 || year > 2026) {
+      validationErrors.push('release_year (1800–2026)');
+    }
+
+    if (rating < 0 || rating > 10) {
+      validationErrors.push('rating (0–10)');
+    }
+
+    if (validationErrors.length > 0) {
+      Alert.alert('Missing or Invalid fields', validationErrors.join(', '));
       return;
     }
 
@@ -109,16 +126,16 @@ const SupervisorFormScreen = () => {
     setLoading(true);
     try {
       const form = new FormData();
-form.append('title', movieData.title);
-form.append('genre', movieData.genre);
-form.append('release_year', Number(movieData.release_year));
-form.append('rating', Number(movieData.rating));
-form.append('director', movieData.director);
-form.append('duration', Number(movieData.duration));
-form.append('main_lead', movieData.main_lead);
-form.append('streaming_platform', movieData.streaming_platform);
-form.append('description', movieData.description);
-form.append('premium', movieData.premium);
+      form.append('title', movieData.title);
+      form.append('genre', movieData.genre);
+      form.append('release_year', Number(movieData.release_year));
+      form.append('rating', Number(movieData.rating));
+      form.append('director', movieData.director);
+      form.append('duration', Number(movieData.duration));
+      form.append('main_lead', movieData.main_lead);
+      form.append('streaming_platform', movieData.streaming_platform);
+      form.append('description', movieData.description);
+      form.append('premium', movieData.premium);
 
       if (poster) {
         form.append('poster', {
@@ -127,6 +144,7 @@ form.append('premium', movieData.premium);
           name: poster.fileName || 'poster.jpg',
         });
       }
+
       if (banner) {
         form.append('banner', {
           uri: banner.uri,
@@ -137,14 +155,16 @@ form.append('premium', movieData.premium);
 
       if (isEditing) {
         await UpdateMovieRequest(movieId, form, token);
+        await fetchMovies();   // active refresh
         Alert.alert('Success', 'Movie updated successfully', [
-          { text: 'OK', onPress: () => navigation.goBack() },
+          { text: 'OK', onPress: () => navigation.replace('Dashboard') },
         ]);
       } else {
         const res = await AddNewMovie(form, token);
-        console.log(res)
+        await fetchMovies();   // active refresh
+        console.log(res);
         Alert.alert('Success', 'Movie added successfully', [
-          { text: 'OK', onPress: () => navigation.goBack() },
+          { text: 'OK', onPress: () => navigation.replace('Dashboard') },
         ]);
       }
     } catch (err) {
@@ -163,7 +183,9 @@ form.append('premium', movieData.premium);
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{isEditing ? 'Edit Movie' : 'Add New Movie'}</Text>
       </View>
-      <ScrollView style={styles.form}>
+      <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
+        <Text style={styles.requiredText}>* Required fields</Text>
+
         {Object.entries({
           Title: 'title',
           Genre: 'genre',
@@ -176,7 +198,10 @@ form.append('premium', movieData.premium);
           Description: 'description',
         }).map(([label, field]) => (
           <View key={field} style={styles.group}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.label}>
+              {label}
+              <Text style={{ color: 'red' }}> * </Text>
+            </Text>
             <TextInput
               style={[styles.input, field === 'description' && styles.textArea]}
               placeholder={label}
@@ -257,76 +282,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.02,
   },
   header: {
-    paddingTop: 40,
-    paddingBottom: 20,
+    paddingTop: height * 0.05,
+    paddingBottom: height * 0.025,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#2563EB',
   },
   form: {
-    padding: 16,
+    padding: width * 0.04,
   },
   group: {
-    marginBottom: 16,
+    marginBottom: height * 0.02,
   },
   label: {
     color: '#333',
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: width * 0.04,
+    marginBottom: height * 0.01,
     fontWeight: '600',
   },
   input: {
     backgroundColor: '#fafafa',
-    borderRadius: 8,
+    borderRadius: width * 0.02,
     borderWidth: 1,
     borderColor: '#e0e0e0',
-    padding: 12,
+    padding: width * 0.03,
     color: '#000',
-    fontSize: 16,
+    fontSize: width * 0.04,
   },
   textArea: {
-    height: 100,
+    height: height * 0.12,
     textAlignVertical: 'top',
   },
   pickerContainer: {
     backgroundColor: '#fafafa',
-    borderRadius: 8,
+    borderRadius: width * 0.02,
     borderWidth: 1,
     borderColor: '#e0e0e0',
     overflow: 'hidden',
   },
   imagePicker: {
     backgroundColor: '#2563EB',
-    padding: 12,
-    borderRadius: 8,
+    padding: width * 0.03,
+    borderRadius: width * 0.02,
     alignItems: 'center',
   },
   imagePickerText: {
     color: '#fff',
     fontWeight: 'bold',
   },
+  requiredText:{
+    color: 'red',
+    marginBottom: height * 0.01,
+    marginTop: height * 0.01 
+  },
   preview: {
     width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginTop: 8,
+    height: height * 0.25,
+    borderRadius: width * 0.02,
+    marginTop: height * 0.01,
   },
   submit: {
     backgroundColor: '#2563EB',
-    borderRadius: 10,
-    padding: 16,
+    borderRadius: width * 0.025,
+    padding: width * 0.04,
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 40,
+    marginTop: height * 0.025,
+    marginBottom: height * 0.05,
   },
   submitText: {
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: 'bold',
     color: '#fff',
   },

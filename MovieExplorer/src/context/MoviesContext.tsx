@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext, createContext} from 'react'
-import { GetMovieById, GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
+import { checkSubscriptionStatus, GetMovieById, GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
+import { Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const MoviesContext = createContext();
 
@@ -14,8 +16,10 @@ const [token, setToken] = useState('')
 const [page, setPage] = useState(1)
 const [allMovies, setAllMovies] = useState(movies)
 const [deviceToken, setDeviceToken] = useState('')
-const [isPremiumRestricted, setIsPremiumRestricted] = useState(true);
+// const [isPremiumRestricted, setIsPremiumRestricted] = useState(true);
 const [username, setUsername] = useState('')
+const [currentPlan, setCurrentPlan] = useState(null);
+  const navigation = useNavigation();
 
     const fetchMovies = async () => {
       try{
@@ -45,15 +49,58 @@ const [username, setUsername] = useState('')
 
     const fetchMoviesById = async (movieId) => {
       try{
-        const filteredById = await GetMovieById(movieId);
+        const filteredById = await GetMovieById(movieId, token);
         setFilById(filteredById)
-        setIsPremiumRestricted(false)
         console.log(filById)
         setLoading(false);
       } catch (error) {
         console.log("Error Occured", error);
         setLoading(false);
       }
+    }
+
+    const fetchCurrentPlan = async () => {
+    if (!token) return;
+    try {
+      const subscription = await checkSubscriptionStatus(token);
+      setCurrentPlan(subscription?.data.plan || null);
+    } catch (error) {
+      console.log('Error fetching current plan:', error);
+      setCurrentPlan(null);
+    }
+  };
+
+  const handleMoviePress = async (item) => {
+      console.log(currentPlan)
+      if (currentPlan === 'free') {
+  
+        console.log(item.id)
+        try {
+          if (item.premium) {
+            Alert.alert(
+              'Restricted Content',
+              'Please subscribe to a Basic or Premium plan to watch this movie.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'View Plans', onPress: () => navigation.navigate('Plans') },
+              ]
+            );
+            return;
+          }
+          // Non-premium movie, allow navigation
+          navigation.navigate('MovieDetails', { item });
+        } catch (error) {
+          console.error('Error fetching movie details:', error);
+        }
+        return;
+  
+      } else {
+  
+      if (currentPlan === 'basic' || currentPlan === 'premium') {
+         navigation.navigate('MovieDetails', { item });
+      }
+  
+     }
     }
 
     useEffect(() => {
@@ -64,8 +111,12 @@ const [username, setUsername] = useState('')
         fetchMoviesByGenre();
     },[apiGenre])
 
+    useEffect(() => {
+    fetchCurrentPlan();
+  }, [token, ]);
+
   return (
-    <MoviesContext.Provider value={{ movies,filteredMovies, loading, setApiGenre, filById, fetchMoviesById, role, setRole, token,  setToken, page, setPage, allMovies, setAllMovies, deviceToken, setDeviceToken, setIsPremiumRestricted, isPremiumRestricted, username, setUsername }}>
+    <MoviesContext.Provider value={{ movies,filteredMovies, fetchMovies, loading, setApiGenre, filById, fetchMoviesById, role, setRole, token,  setToken, page, setPage, allMovies, setAllMovies, deviceToken, setDeviceToken, username, setUsername, currentPlan, setCurrentPlan, fetchCurrentPlan, handleMoviePress}}>
       {children}
     </MoviesContext.Provider>
   )

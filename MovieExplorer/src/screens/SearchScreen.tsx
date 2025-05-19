@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import GenreSearchResultComponent from '../components/GenreSearchResultComponent';
 import FooterComponent from '../components/FooterComponent';
 import SearchInputComponent from '../components/SearchInputComponent';
 import MovieCardItem from '../components/MovieCardItem';
-import { useNavigation } from '@react-navigation/native';
+import { useMovies } from '../context/MoviesContext';
 
 const { height, width } = Dimensions.get('window')
 
 const SearchScreen = () => {
-  const navigation = useNavigation();
   const [isSearching, setIsSearching] = useState(false);
   const [filteredMovies, setFilteredMovies] = useState([]);
+
+  const { handleMoviePress } = useMovies();
+
   return (
     <View style={styles.container}>
       <View style = {styles.searchCompStyle}>
@@ -24,13 +26,13 @@ const SearchScreen = () => {
       <View style={styles.scrollArea}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {isSearching ? (
-            <>
+          <>
             <Text style={styles.heading}>Results</Text>
             <FlatList
               data={filteredMovies}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => 
-              <TouchableOpacity onPress={()=>navigation.navigate('MovieDetails', {item})}>
+              <TouchableOpacity onPress={() => handleMoviePress(item)}>
               <MovieCardItem item={item} />
               </TouchableOpacity>
               }
@@ -38,7 +40,12 @@ const SearchScreen = () => {
               contentContainerStyle={{ padding: 10 }}
               scrollEnabled= {false}
             />
-            </>
+              {filteredMovies.length === 0 && (
+                <Text style={{ textAlign: 'center', marginTop: 20, fontSize: 16, color: '#666' }}>
+                   No results found.
+                </Text>
+              )}
+          </>
           ) : (
             <GenreSearchResultComponent />
           )}
@@ -68,7 +75,7 @@ const styles = StyleSheet.create({
   searchCompStyle:{
     paddingHorizontal: width * 0.025,
     paddingTop: height * 0.035,
-    paddingBottom: height * 0.015,
+    paddingBottom: height * 0.005,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20
   },

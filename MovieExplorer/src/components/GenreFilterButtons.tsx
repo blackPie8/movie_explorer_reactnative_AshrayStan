@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import MovieCardItem from './MovieCardItem';
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +8,7 @@ import { GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
 const { width, height } = Dimensions.get('window');
 
 const GenreFilterButtons = () => {
-  const { movies } = useMovies();
+  const { movies, handleMoviePress } = useMovies();
   const navigation = useNavigation();
 
   const [selectedGenre, setSelectedGenre] = useState('All');
@@ -32,8 +32,16 @@ const GenreFilterButtons = () => {
     setLoading(true);
 
     if (genre === 'All') {
-      setFilteredMovies(movies);
-      setAllMovies(movies);
+      try {
+        const page1Movies = await GetMoviesData(1);
+        setAllMovies(page1Movies);
+        setFilteredMovies(page1Movies);
+        if (page1Movies.length < 10) setHasMore(false);
+      } catch (err) {
+        console.log("Error fetching all movies:", err);
+        setAllMovies([]);
+        setFilteredMovies([]);
+      }
     } else {
       try {
         const genreMovies = await GetMoviesByGenre(genre);
@@ -55,6 +63,28 @@ const GenreFilterButtons = () => {
   };
 
   useEffect(() => {
+    if (selectedGenre === 'All') {
+      // Re-fetch from API instead of using context movies
+      const refreshAll = async () => {
+        try {
+          setLoading(true);
+          const page1 = await GetMoviesData(1);
+          setAllMovies(page1);
+          setFilteredMovies(page1);
+          setPage(1);
+          setHasMore(page1.length >= 10);
+        } catch (err) {
+          console.error("Error reloading movies:", err);
+        }
+        setLoading(false);
+      };
+
+      refreshAll();
+    }
+  }, [movies]);
+
+
+  useEffect(() => {
     const fetchMoreMovies = async () => {
       setLoading(true);
       const newMovies = await GetMoviesData(page);
@@ -68,8 +98,8 @@ const GenreFilterButtons = () => {
           selectedGenre === 'All'
             ? uniqueMovies
             : uniqueMovies.filter(
-                (movie) => movie.genre?.toLowerCase() === selectedGenre.toLowerCase()
-              );
+              (movie) => movie.genre?.toLowerCase() === selectedGenre.toLowerCase()
+            );
 
         setFilteredMovies(updatedFiltered);
 
@@ -87,7 +117,9 @@ const GenreFilterButtons = () => {
   }, [page]);
 
   const renderMovieItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('MovieDetails', { item })}>
+    <TouchableOpacity
+      onPress={() => handleMoviePress(item)}
+    >
       <MovieCardItem item={item} />
     </TouchableOpacity>
   );
@@ -120,7 +152,7 @@ const GenreFilterButtons = () => {
         ))}
       </ScrollView>
 
-      <Text style={styles.trendingText}>Trending Now</Text>
+      <Text style={styles.trendingText}>Browse {selectedGenre}</Text>
 
       {loading && page === 1 ? (
         <ActivityIndicator size="large" color="#0000ff" />
@@ -134,18 +166,17 @@ const GenreFilterButtons = () => {
           contentContainerStyle={styles.contentScroll}
           scrollEnabled={false}
           ListFooterComponent={
-            hasMore ? (
-              loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-              ) : (
-                <TouchableOpacity onPress={loadMore} style={styles.loadMoreButton}>
-                  <Text style={styles.loadMoreText}>Load More</Text>
-                </TouchableOpacity>
-              )
+            loading ? (
+              <ActivityIndicator size="large" color="#0000ff" style={{ marginVertical: 16 }} />
+            ) : hasMore ? (
+              <TouchableOpacity onPress={loadMore} style={styles.loadMoreButton}>
+                <Text style={styles.loadMoreText}>Load More</Text>
+              </TouchableOpacity>
             ) : (
               <Text style={styles.endText}>Oops, You scrolled too far</Text>
             )
           }
+
         />
       )}
     </View>

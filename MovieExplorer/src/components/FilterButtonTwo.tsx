@@ -8,7 +8,7 @@ const { height, width } = Dimensions.get('window');
 const FilterButtonTwo = () => {
   const { movies, setApiGenre } = useMovies();
 
-  const popularGenre = [...new Set(movies.map((movie) => movie.genre))];
+  const popularGenre = [...new Set(movies.map((movie) => movie.genre ))];
 
   return (
     <View style={styles.container}>

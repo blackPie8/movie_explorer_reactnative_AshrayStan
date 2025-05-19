@@ -1,16 +1,17 @@
-import { StyleSheet, Text, TextInput, View, Dimensions, Image, TouchableOpacity, } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Dimensions, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useMovies } from '../context/MoviesContext';
+import { searchMovies, getSuggestions } from '../axiosQuery/axiosRequest';
 
 const { height, width } = Dimensions.get('window');
 
 const SearchInputComponent = ({ setFilteredMovies, setIsSearching }) => {
-  const { movies } = useMovies();
-
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [loading, setLoading] = useState(false);
 
+  // Debounce logic
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebouncedQuery(query);
@@ -18,31 +19,52 @@ const SearchInputComponent = ({ setFilteredMovies, setIsSearching }) => {
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  const suggestions = movies.filter(
-    (movie) =>
-      movie.title.toLowerCase().includes(debouncedQuery.toLowerCase()) &&
-      debouncedQuery.trim().length > 0
-  );
+  // Fetch suggestions as user types
+  useEffect(() => {
+    if (debouncedQuery.trim().length > 0) {
+      fetchSuggestions(debouncedQuery);
+    } else {
+      setSuggestions([]);
+    }
+  }, [debouncedQuery]);
 
-  const handleSearch = () => {
-    const results = movies.filter(
-      (movie) =>
-        movie.title.toLowerCase().includes(query.toLowerCase()) &&
-        query.trim().length > 0
-    );
-    setFilteredMovies(results);
-    setIsSearching(true);
-    setShowSuggestions(false);
+  const fetchSuggestions = async (searchTerm) => {
+    try {
+      const results = await getSuggestions(searchTerm);
+      setSuggestions(results);
+    } catch (error) {
+      console.log("Error fetching suggestions:", error?.response?.data || error.message);
+    }
   };
 
-  const handleSuggestionTap = (title: string) => {
+  const handleSearch = async () => {
+    if (query.trim().length === 0) return;
+    setLoading(true);
+    try {
+      const results = await searchMovies(query);
+      setFilteredMovies(results);
+      setIsSearching(true);
+    } catch (error) {
+      console.log("Error during search:", error?.response?.data || error.message);
+    } finally {
+      setLoading(false);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionTap = async (title) => {
     setQuery(title);
-    const results = movies.filter((movie) =>
-      movie.title.toLowerCase().includes(title.toLowerCase())
-    );
-    setFilteredMovies(results);
-    setIsSearching(true);
-    setShowSuggestions(false);
+    setLoading(true);
+    try {
+      const results = await searchMovies(title);
+      setFilteredMovies(results);
+      setIsSearching(true);
+    } catch (error) {
+      console.log("Error on suggestion tap:", error?.response?.data || error.message);
+    } finally {
+      setLoading(false);
+      setShowSuggestions(false);
+    }
   };
 
   return (
@@ -65,6 +87,10 @@ const SearchInputComponent = ({ setFilteredMovies, setIsSearching }) => {
           autoFocus
         />
       </View>
+
+      {loading && (
+        <ActivityIndicator size="small" color="#888" style={{ marginTop: 10 }} />
+      )}
 
       {showSuggestions && suggestions.length > 0 && (
         <View style={styles.suggestionsBox}>

@@ -7,6 +7,7 @@ import MovieDetails from '../components/MovieDetails';
 import PlansScreen from '../screens/PlansScreen';
 import SupervisorFormScreen from '../screens/SupervisorFormScreen';
 import PaymentScreen from '../screens/PaymentScreen';
+import PaymentGatewayScreen from '../screens/PaymentGatewayScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function SupervisorStack() {
         <Stack.Screen name="MovieDetails" component={MovieDetails} options={{headerShown: false}} />
         <Stack.Screen name="Supervisor" component={SupervisorFormScreen} options={{headerShown: false}} />
         <Stack.Screen name="Payment" component={PaymentScreen} options={{headerShown: false}} />
+        <Stack.Screen name="PaymentGateway" component={PaymentGatewayScreen} options={{headerShown: false}} />
       </Stack.Navigator>
   );
 }

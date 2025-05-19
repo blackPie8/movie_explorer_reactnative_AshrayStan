@@ -1,17 +1,46 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { useMovies } from '../context/MoviesContext';
 import { useNavigation } from '@react-navigation/native';
+import { deleteExistingMovie } from '../axiosQuery/axiosRequest';
 
 const { width, height } = Dimensions.get('window');
 
 const MovieCardItem = ({ item }) => {
-    const { role } = useMovies();
+    const { role, token, fetchMovies } = useMovies();
     const isSupervisor = role === 'supervisor'
       const navigation = useNavigation();
 
     const handleEditClick = (movieId) => {
       navigation.navigate('Supervisor',{movieId, isEditing : true})
+    }
+
+    const handleDeleteClick = (movieId) => {
+      Alert.alert(
+        'Are you sure you want to delete this movie',
+        '',
+        [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+            {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async() => {
+                    try {
+            await deleteExistingMovie(movieId, token);
+            await fetchMovies(); // active refresh
+            Alert.alert('Success', 'Movie deleted successfully', [
+              { text: 'OK', onPress: () => navigation.replace('Dashboard') },
+              ]);
+          } catch (error) {
+            Alert.alert('Error', 'Failed to delete the movie.');
+          }
+        }
+      },
+        ]
+      )
     }
 
   return (
@@ -32,10 +61,10 @@ const MovieCardItem = ({ item }) => {
       {
         isSupervisor && (
           <View style = {styles.iconCont}>
-            <TouchableOpacity onPress={() => handleEditClick(item.id)}>
+            <TouchableOpacity onPress ={() => handleEditClick(item.id)}>
             <Image source={require('../assets/pen.png')} style = {styles.penImg}/>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onLongPress={() => handleDeleteClick(item.id)}>
             <Image source={require('../assets/trash-bin.png')} style = {styles.trashIcon} />
             </TouchableOpacity>
           </View>
@@ -110,7 +139,7 @@ const styles = StyleSheet.create({
   },
   penImg: {
     height : height * 0.02,
-    width : width * 0.05,
+    width : width * 0.04,
     tintColor: '#fff'
   },
   iconCont:{
@@ -122,7 +151,7 @@ const styles = StyleSheet.create({
   },
   trashIcon:{
     height : height * 0.02,
-    width : width * 0.05,
+    width : width * 0.04,
     tintColor: '#fff'
   },
   premiumText:{
@@ -138,4 +167,3 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 10
   }
 });
-

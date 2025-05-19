@@ -1,37 +1,58 @@
-import React, { useEffect } from 'react';
-import {
-  View, Text, StyleSheet, ImageBackground, Dimensions,
-  ActivityIndicator, ScrollView, Image, TouchableOpacity
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ImageBackground, Dimensions, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useMovies } from '../context/MoviesContext';
 
 const { height, width } = Dimensions.get('window');
+import { GetMovieById } from '../axiosQuery/axiosRequest';
+
+type Movie = {
+  id: string;
+  title: string;
+  description: string;
+  genre: string;
+  rating: number;
+  release_year: string;
+  director: string;
+  poster_url: string;
+  premium: boolean;
+  streaming_platform: string;
+  main_lead: string;
+};
 
 const MovieDetails = ({ route, navigation }) => {
   const { item } = route.params;
-  const { fetchMoviesById, filById, isPremiumRestricted } = useMovies();
+  const { token } = useMovies();
+
+  const [movieData, setMovieData] = useState<Movie | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMoviesById(item.id);
+    const fetchData = async () => {
+      try {
+        const result = await GetMovieById(item.id, token);
+        setMovieData(result);
+      } catch (err) {
+        console.log('Error fetching movie:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [item.id]);
 
-  // Safe redirection in useEffect
-  useEffect(() => {
-    if (isPremiumRestricted || filById === null) {
-      navigation.replace('Plans');
-    }
-  }, [isPremiumRestricted, filById]);
-
-  // Prevent render before redirection
-  if (isPremiumRestricted || filById === null) {
-    return null;
+  if (loading || !movieData) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={{ uri: filById.poster_url }}
+        source={{ uri: movieData.poster_url }}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -47,16 +68,22 @@ const MovieDetails = ({ route, navigation }) => {
 
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.infoContainer}>
-              <Text style={styles.title}>{filById.title}</Text>
+              <Text style={styles.title}>{movieData.title}</Text>
               <Text style={styles.genre}>
-                {filById.genre} • IMDB ⭐ {filById.rating}
+                {movieData.genre} • IMDB ⭐ {movieData.rating}
               </Text>
-              <Text style={styles.description}>{filById.description}</Text>
+              <Text style={styles.description}>{movieData.description}</Text>
+
               <Text style={styles.extra}>
-                🎬 {filById.director} • {filById.release_year}
+                {movieData.director} • {movieData.release_year}
               </Text>
+              
               <Text style={styles.extra}>
-                📺 Streaming on: {filById.streaming_platform}
+                Stars: {movieData.main_lead}
+              </Text>
+
+              <Text style={styles.extra}>
+                Streaming on: {movieData.streaming_platform}
               </Text>
             </View>
           </ScrollView>
