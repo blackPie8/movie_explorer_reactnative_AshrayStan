@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LogoutRequest } from '../axiosQuery/axiosRequest';
 import { useMovies } from '../context/MoviesContext';
@@ -12,7 +12,7 @@ const ProfileSettings = () => {
 
      const handelSignOut = async() => {
     const res = await LogoutRequest(token);
-    console.log(res.data);
+    console.log(res?.data);
    }
 
   return (
@@ -52,13 +52,30 @@ const ProfileSettings = () => {
           { label: 'Log Out', icon: require('../assets/logout.png'), isDanger: true },
         ].map((item, index) => (
           <TouchableOpacity key={index} 
-          onPress={ async()=> {
-            await handelSignOut();
-
-            if(item.isDanger){
-            navigation.replace('Login') 
-            }
-          }}>
+          onPress={() => {
+      if (item.isDanger) {
+        Alert.alert(
+          'Confirm Logout',
+          'Are you sure you want to log out?',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Log Out',
+              style: 'destructive',
+              onPress: async () => {
+                await handelSignOut();
+                navigation.replace('Login');
+              },
+            },
+          ],
+          { cancelable: true }
+        );
+      }
+    }}
+          >
           <View style={styles.settingItem}>
             <Image source={item.icon} style={[ styles.iconSetting, item.isDanger && {tintColor: '#eb2323'} ]} />
             <Text style={[styles.settingText, item.isDanger && { color: '#eb2323' }]}>

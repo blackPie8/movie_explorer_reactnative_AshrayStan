@@ -1,15 +1,13 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React from 'react';
 import { useMovies } from '../context/MoviesContext';
 import FilterButtonTwo from './FilterButtonTwo';
 import MovieCardItem from './MovieCardItem';
-import { useNavigation } from '@react-navigation/native';
 
 const { height, width } = Dimensions.get('window');
 
 const SearchResultComponent = () => {
-  const navigation = useNavigation();
-  const { filteredMovies, handleMoviePress } = useMovies();
+  const { filteredMovies, handleMoviePress, apiGenre, loading } = useMovies();
 
   const renderMovieItem = ({ item }) =>
   <TouchableOpacity onPress={() => handleMoviePress(item)}>
@@ -20,8 +18,20 @@ const SearchResultComponent = () => {
       <Text style={styles.heading}>Explore Your Interest</Text>
       <FilterButtonTwo />
 
-      <Text style={styles.heading}>Results</Text>
-      <FlatList
+      {
+        !apiGenre ? (
+          <Text style = {styles.heading}>Browse</Text>
+        ) : (
+          <Text style={styles.heading}>Browse {apiGenre}</Text>
+        )
+      }
+      
+    {
+      loading ? (
+        <ActivityIndicator size={28} color="#0000ff" />
+      ) : 
+      (
+              <FlatList
         keyExtractor={(item) => item.id.toString()}
         data={filteredMovies}
         renderItem={renderMovieItem}
@@ -29,6 +39,8 @@ const SearchResultComponent = () => {
         scrollEnabled={false}
         contentContainerStyle={styles.listContainer}
       />
+      )
+    }
     </View>
   );
 };

@@ -9,7 +9,7 @@ import Images from '../constants/Images';
 const { width, height } = Dimensions.get('window');
 
 const PlansScreen = ({ navigation }) => {
-  const { token, currentPlan } = useMovies();
+  const { token, currentPlan, status, planDuration } = useMovies();
   const [selectedPlan, setSelectedPlan] = useState(currentPlan || 'basic');
 
   useEffect(() => {
@@ -24,6 +24,7 @@ const PlansScreen = ({ navigation }) => {
       return;
     }
 
+    if(currentPlan === 'free'){
     try {
       const res = await createSubscription(planType, token);
       console.log('Subscription response:', res);
@@ -43,6 +44,10 @@ const PlansScreen = ({ navigation }) => {
       console.error('Payment initiation failed:', error);
       Alert.alert('Error', 'Failed to initiate payment');
     }
+  } else{
+    Alert.alert(`You have an active ${currentPlan} plan subscription currently!`)
+  } 
+
   };
 
   return (
@@ -79,7 +84,7 @@ const PlansScreen = ({ navigation }) => {
                   </Text>
                   <Text style={[styles.price, isSelected && styles.selectedText]}>
                     {plan.price}
-                    <Text style={styles.month}>/month</Text>
+                    <Text style={styles.month}>{plan.duration}</Text>
                   </Text>
                 </View>
 
@@ -96,6 +101,16 @@ const PlansScreen = ({ navigation }) => {
                     </Text>
                   </View>
                 ))}
+
+                { isCurrentPlan &&
+                  <Text style={[styles.planEndDate, isSelected && styles.selectedText]}>
+                  Plan ends on: {new Date(planDuration).toLocaleString('en-US',{
+                        month: 'long',
+                        day: 'numeric',
+                  }
+                  )}
+                  </Text>
+                }
 
                 <TouchableOpacity
                   style={[styles.button, isSelected && styles.currentButton]}
@@ -158,6 +173,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
     borderColor: '#2563EB',
   },
+  planEndDate: {
+  fontSize: 14,
+  color: 'red',
+  marginVertical: 8,
+  textAlign: 'center',
+},
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

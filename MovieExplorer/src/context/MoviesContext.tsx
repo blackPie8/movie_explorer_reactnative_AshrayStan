@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, createContext} from 'react'
-import { checkSubscriptionStatus, GetMovieById, GetMoviesByGenre, GetMoviesData } from '../axiosQuery/axiosRequest';
+import { checkSubscriptionStatus, GetMovieById, GetMoviesByGenre, GetMoviesData, showProfilePicture } from '../axiosQuery/axiosRequest';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -19,6 +19,10 @@ const [deviceToken, setDeviceToken] = useState('')
 // const [isPremiumRestricted, setIsPremiumRestricted] = useState(true);
 const [username, setUsername] = useState('')
 const [currentPlan, setCurrentPlan] = useState(null);
+const [status, setStatus] = useState(null);
+const [planDuration, setPlanDuration] = useState(null);
+const [profileImage, setProfileImage] = useState(null);
+const [loadingProfileImage, setLoadingProfileImage] = useState(true);
   const navigation = useNavigation();
 
     const fetchMovies = async () => {
@@ -64,6 +68,8 @@ const [currentPlan, setCurrentPlan] = useState(null);
     try {
       const subscription = await checkSubscriptionStatus(token);
       setCurrentPlan(subscription?.data.plan || null);
+      setStatus(subscription?.data.status || null);
+      setPlanDuration(subscription?.data.current_period_end || null);
     } catch (error) {
       console.log('Error fetching current plan:', error);
       setCurrentPlan(null);
@@ -103,6 +109,18 @@ const [currentPlan, setCurrentPlan] = useState(null);
      }
     }
 
+   const fetchProfileImage = async () => {
+  try {
+    setLoadingProfileImage(true);
+    const url = await showProfilePicture(token);
+    setProfileImage(url);
+  } catch (err) {
+    console.error("Failed to fetch profile image:", err);
+  } finally {
+    setLoadingProfileImage(false);
+  }
+};
+
     useEffect(() => {
       fetchMovies();
     }, []);
@@ -116,7 +134,7 @@ const [currentPlan, setCurrentPlan] = useState(null);
   }, [token, ]);
 
   return (
-    <MoviesContext.Provider value={{ movies,filteredMovies, fetchMovies, loading, setApiGenre, filById, fetchMoviesById, role, setRole, token,  setToken, page, setPage, allMovies, setAllMovies, deviceToken, setDeviceToken, username, setUsername, currentPlan, setCurrentPlan, fetchCurrentPlan, handleMoviePress}}>
+    <MoviesContext.Provider value={{ movies,filteredMovies, fetchMovies, loading, apiGenre, setApiGenre, filById, fetchMoviesById, role, setRole, token,  setToken, page, setPage, allMovies, setAllMovies, deviceToken, setDeviceToken, username, setUsername, currentPlan, setCurrentPlan, fetchCurrentPlan, handleMoviePress, status, setStatus, planDuration, profileImage, setProfileImage,  loadingProfileImage, fetchProfileImage}}>
       {children}
     </MoviesContext.Provider>
   )

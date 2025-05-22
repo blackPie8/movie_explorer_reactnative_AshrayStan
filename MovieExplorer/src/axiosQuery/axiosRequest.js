@@ -5,7 +5,7 @@ const BASE_URL = 'https://movie-explorer-ror-vishal-kanojia.onrender.com/api/v1'
 
 export const SignUpRequest = async (data) => {
   const res = await axios.post(
-    `${BASE_URL}`,
+    `${BASE_URL}/users`,
     data,
     {
       headers: {
@@ -310,3 +310,62 @@ export const deleteExistingMovie = async (id, token) => {
     return false;
   }
 };
+
+
+export const cancelSubscription = async(token) => {
+  console.log(token)
+  try{
+    await axios.post(
+      `${BASE_URL}/subscriptions/cancel`,
+      null,
+    {
+      headers: {
+        Authorization: `Bearer ${token}` ,
+        'Accept': 'application/json'
+      }
+    });
+  } catch (error){
+    console.log("Error cancelling Subscription: ", error.response);
+    Alert.alert(error.response || 'Failure to cancel subscription');
+  }
+}
+
+
+export const addProfilePicture = async(formData, token) => {
+  try{
+    const response = await axios.patch(
+      `${BASE_URL}/users/update_profile_picture`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': `multipart/form-data`,
+        },
+      }
+    )
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log('Error uploading profile picture:', error.response?.data || error.message);
+  }
+}
+
+
+export const showProfilePicture = async(token) => {
+  try{
+    const response = await axios.get(
+      `${BASE_URL}/users/show_profile_picture`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        }
+      }
+    )
+    console.log(response.data.profile_picture_url);
+    return response.data.profile_picture_url;
+
+  } catch(error){
+    console.log('Error showing profile picture:', error.response?.data || error.message);
+  }
+}

@@ -38,7 +38,9 @@ const Images = {
   user: require('../assets/user.png'),
   name: require('../assets/signature.png'),
   phone: require('../assets/telephone.png'),
-  war: require('../assets/war.jpg')
+  war: require('../assets/war.jpg'),
+  cancel: require('../assets/close.png'),
+  photo: require('../assets/gallery.png'),
 };
 
 export default Images;
